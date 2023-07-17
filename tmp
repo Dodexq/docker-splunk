@@ -1,0 +1,11 @@
+docker run --network skynet --name so1 --hostname so1 -p 8000:8000 \
+              -e "SPLUNK_PASSWORD=au1195lg" \
+              -e "SPLUNK_START_ARGS=--accept-license" \
+              -it splunk/splunk:latest
+
+
+docker run --network skynet --name uf1 --hostname uf1 \
+              -e "SPLUNK_PASSWORD=au1195lg" \
+              -e "SPLUNK_START_ARGS=--accept-license" \
+              -e "SPLUNK_STANDALONE_URL=so1" \
+              -it splunk/universalforwarder:latest
