@@ -1,7 +1,7 @@
 FROM centos:7
 ENV SPLUNK_HOME /splunkforwarder
 ENV SPLUNK_ROLE splunk_heavy_forwarder
-ENV SPLUNK_PASSWORD changeme
+ENV SPLUNK_PASSWORD passwd!@#
 ENV SPLUNK_START_ARGS --accept-license
 
 RUN yum install -y epel-release \
@@ -16,7 +16,7 @@ RUN wget -O splunkforwarder-7.2.4-8a94541dcfac-Linux-x86_64.tgz 'https://www.spl
 
 COPY [ "inputs.conf", "docker-stats/props.conf", "/splunkforwarder/etc/system/local/" ]
 COPY [ "docker-stats/docker_events.sh", "docker-stats/docker_inspect.sh", "docker-stats/docker_stats.sh", "docker-stats/docker_top.sh", "/splunkforwarder/bin/scripts/" ]
-COPY splunkclouduf.spl /splunkclouduf.spl
+RUN sudo ./splunk add forward-server splunk:9997 -auth admin:passwd!@#
 COPY first_start.sh /splunkforwarder/bin/
 
 RUN chmod +x /splunkforwarder/bin/scripts/*.sh \

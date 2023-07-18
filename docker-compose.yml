@@ -11,14 +11,15 @@ services:
       splunknet:
         aliases:
           - uf1
-    image: ${UF_IMAGE:-splunk/universalforwarder:latest}
+    image: ${UF_IMAGE:-dodex/uforward:latest}
     hostname: uf1
     container_name: uf1
     environment:
-      - SPLUNK_START_ARGS=--accept-license
       - SPLUNK_STANDALONE_URL=so1
-      - SPLUNK_ADD=udp 1514,monitor /var/log/*
-      - SPLUNK_PASSWORD=admin!@#
+      - SPLUNK_INDEX=dev
+    volumes:
+       - /var/lib/docker/containers:/host/containers:ro
+       - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
       - 8089
 
@@ -27,11 +28,11 @@ services:
       splunknet:
         aliases:
           - so1
-    image: ${SPLUNK_IMAGE:-outcoldman/splunk:6.4.3}
+    image: ${SPLUNK_IMAGE:-splunk/splunk:latest}
     hostname: so1
     container_name: so1
     environment:
-      - SPLUNK_START_ARGS=--accept-license --answer-yes --no-prompt
+      - SPLUNK_START_ARGS= --accept-license
       - SPLUNK_STANDALONE_URL=so1
       - SPLUNK_PASSWORD=admin!@#
     ports:
