@@ -37,74 +37,26 @@ services:
       - SPLUNK_PASSWORD=admin!@#
     ports:
       - 8000:8000
+      - 8088:8088
       - 8089
       - 9997
 
-
-
-
-# version: '3'
-
-# networks:
-#   skynet:
-
-# services:
-#   splunkenterprise:
-#     hostname: splunkenterprise
-#     image: outcoldman/splunk:6.4.3
-#     environment:
-#       SPLUNK_START_ARGS: --accept-license
-#       SPLUNK_ENABLE_LISTEN: 9997
-#       SPLUNK_ADD: tcp 1514
-#     volumes:
-#       - ./splunkenterprise/opt-splunk-etc:/opt/splunk/etc
-#       - ./splunkenterprise/opt-splunk-etc:/opt/splunk/var
-#     ports:
-#       - "8000:8000"
-#       - "9997:9997"
-#       - "8088:8088"
-#       - "1514:1514"
-#     networks:
-#       - skynet
-
-
-#   # splunk-forwarder:
-#   #   image: splunk/universalforwarder:7.2.2
-#   #   ports:
-#   #     - "514:1514/udp"
-#   #   deploy:
-#   #     replicas: 2
-#   #   environment:
-#   #     SPLUNK_START_ARGS: --accept-license --answer-yes
-#   #     SPLUNK_FORWARD_SERVER: "splunkenterprise:9997"
-#   #     SPLUNK_USER: root
-#   #   volumes:
-#   #     - ./splunk-forwarder/opt-splunk-etc:/opt/splunk/etc
-#   #     - ./splunk-forwarder/opt-splunk-etc:/opt/splunk/var
-#   #     - /var/lib/docker/containers:/host/containers:ro
-#   #     - /var/log:/docker/log:ro
-#   #     - /var/run/docker.sock:/var/run/docker.sock:ro 
-
-#   dockerforwarder:
-#     hostname: docker
-#     image: dodex/docker-stats-splunk-forwarder
-#     volumes:
-#       - /var/run/docker.sock:/var/run/docker.sock:ro
-#     environment:
-#       - SPLUNK_FORWARD_SERVER=splunkenterprise:9997
-#     restart: always
-#     depends_on:
-#       - splunkenterprise
-#     networks:
-#       - skynet
-
-
-#   # nginx:
-#   #   image: nginx:1.17.3
-#   #   container_name: nginx
-#   #   restart: unless-stopped
-#   #   hostname: nginx
-#   #   ports:
-#   #     - 80:80/tcp
-#   #     - 443:443/tcp
-  
+  nginx:
+    networks:
+      splunknet:
+        aliases:
+          - nginx
+    image: ${SPLUNK_IMAGE:-nginx}
+    hostname: nginx
+    container_name: nginx
+    logging:
+        driver: splunk
+        options:
+            splunk-url: http://172.23.0.3:8088
+            splunk-token: 38fd07e4-fe12-4d36-9e15-b0a3df561b1a
+            splunk-index: splunk_index
+            splunk-insecureskipverify: "true"
+            splunk-format: "json"
+            tag: "{{.Name}}/{{.ID}}"
+    ports:
+      - 80:80

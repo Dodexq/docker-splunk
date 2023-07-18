@@ -1,14 +1,1 @@
-docker run --network skynet --name so1 --hostname so1 -p 8000:8000 \
-              -e "SPLUNK_PASSWORD=passwd!@#" \
-              -e "SPLUNK_START_ARGS=--accept-license" \
-              -it splunk/splunk:latest
-
-
-docker run --network skynet --name uf1 --hostname uf1 \
-              -e "SPLUNK_PASSWORD=passwd!@#" \
-              -e "SPLUNK_START_ARGS=--accept-license" \
-              -e "SPLUNK_STANDALONE_URL=splunk" \
-              -it splunk/universalforwarder:latest
-
-
-docker run -d -p 8000:8000 -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=passwd!@#" --network skynet --name splunk splunk/splunk:latest
+docker run -p 80:80 --network skynet --log-driver=splunk --log-opt splunk-url=http://172.23.0.3:8088 --log-opt splunk-token=38fd07e4-fe12-4d36-9e15-b0a3df561b1a --log-opt splunk-insecureskipverify=false nginx
