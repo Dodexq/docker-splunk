@@ -7,7 +7,7 @@ ENV SPLUNK_START_ARGS --accept-license
 RUN yum install -y epel-release \
     && yum install -y wget expect jq
 
-RUN wget -O splunkforwarder-7.2.4-8a94541dcfac-Linux-x86_64.tgz 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.2.4&product=universalforwarder&filename=splunkforwarder-7.2.4-8a94541dcfac-Linux-x86_64.tgz&wget=true' \
+RUN wget -O splunkforwarder-7.2.4-8a94541dcfac-Linux-x86_64.tgz 'https://download.splunk.com/products/universalforwarder/releases/7.2.4/linux/splunkforwarder-7.2.4-8a94541dcfac-Linux-x86_64.tgz' \
     && wget -O docker-18.09.3.tgz 'https://download.docker.com/linux/static/stable/x86_64/docker-18.09.3.tgz' \
     && tar -xvf splunkforwarder-7.2.4-8a94541dcfac-Linux-x86_64.tgz \
     && tar -xvf docker-18.09.3.tgz  \
@@ -15,8 +15,7 @@ RUN wget -O splunkforwarder-7.2.4-8a94541dcfac-Linux-x86_64.tgz 'https://www.spl
     && rm -f docker-18.09.3.tgz
 
 COPY [ "inputs.conf", "docker-stats/props.conf", "/splunkforwarder/etc/system/local/" ]
-COPY [ "docker-stats/docker_events.sh", "docker-stats/docker_inspect.sh", "docker-stats/docker_stats.sh", "docker-stats/docker_top.sh", "/splunkforwarder/bin/scripts/" ]
-RUN sudo ./splunk add forward-server splunk:9997 -auth admin:passwd!@#
+COPY [ "docker-stats/docker_events.sh", "docker-stats/docker_inspect.sh", "docker-stats/docker_stats.sh", "docker-stats/docker_top.sh", "docker-stats/docker_stats.sh", "/splunkforwarder/bin/scripts/" ]
 COPY first_start.sh /splunkforwarder/bin/
 
 RUN chmod +x /splunkforwarder/bin/scripts/*.sh \
@@ -25,7 +24,6 @@ RUN chmod +x /splunkforwarder/bin/scripts/*.sh \
     && echo "%sudo ALL=NOPASSWD:ALL" >> /etc/sudoers \
     && chown -R splunk:splunk $SPLUNK_HOME \
     && /splunkforwarder/bin/first_start.sh \
-    && /splunkforwarder/bin/splunk install app /splunkclouduf.spl -auth admin:changeme \
     && /splunkforwarder/bin/splunk restart
 
 COPY [ "init/entrypoint.sh", "init/checkstate.sh", "/sbin/" ]

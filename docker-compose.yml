@@ -11,7 +11,7 @@ services:
       splunknet:
         aliases:
           - uf1
-    image: ${UF_IMAGE:-dodex/uforward:latest}
+    image: ${UF_IMAGE:-dodex/uforward2:latest}
     hostname: uf1
     container_name: uf1
     environment:
