@@ -45,8 +45,8 @@ services:
     logging:
         driver: splunk
         options:
-            splunk-url: http://172.23.0.3:8088
-            splunk-token: 38fd07e4-fe12-4d36-9e15-b0a3df561b1a
+            splunk-url: http://172.23.0.2:8088
+            splunk-token: f16ff2ee-0773-43e3-9bbd-21f1bca57110
             splunk-index: splunk_index
             splunk-insecureskipverify: "true"
             splunk-format: "json"
@@ -64,8 +64,8 @@ services:
     logging:
         driver: splunk
         options:
-            splunk-url: http://172.23.0.3:8088
-            splunk-token: 38fd07e4-fe12-4d36-9e15-b0a3df561b1a
+            splunk-url: http://172.23.0.2:8088
+            splunk-token: f16ff2ee-0773-43e3-9bbd-21f1bca57110
             splunk-index: splunk_index
             splunk-insecureskipverify: "true"
             splunk-format: "json"
@@ -82,8 +82,8 @@ services:
     logging:
         driver: splunk
         options:
-            splunk-url: http://172.23.0.3:8088
-            splunk-token: 38fd07e4-fe12-4d36-9e15-b0a3df561b1a
+            splunk-url: http://172.23.0.2:8088
+            splunk-token: f16ff2ee-0773-43e3-9bbd-21f1bca57110
             splunk-index: splunk_index
             splunk-insecureskipverify: "true"
             splunk-format: "json"

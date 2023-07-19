@@ -1,1 +1,0 @@
-docker run -p 80:80 --network skynet --log-driver=splunk --log-opt splunk-url=http://172.23.0.3:8088 --log-opt splunk-token=38fd07e4-fe12-4d36-9e15-b0a3df561b1a --log-opt splunk-insecureskipverify=false nginx
