@@ -85,7 +85,19 @@ Login `admin` pass: `admin!@#` - можно изменить env: `- SPLUNK_PASS
 <a href="https://raw.githubusercontent.com/Dodexq/docker-splunk/main/screenshots/4.png" rel="some text"><img src="https://raw.githubusercontent.com/Dodexq/docker-splunk/main/screenshots/4.png" alt="" width="500" /></a>
 </p>
 
+Добавляем два индекса: `dev_docker_node` и `dev_docker_stats`
+`Settings > Indexes > New Index`
+
 Build images: `cd ./u-splunk-forwarder > docker build --tag="$USER/uforward" .`
+
+По дефолту user:pass `adminforward:admin4orward` создается при первом старте `./u-splunk-forwarder/first_start.sh`
+
+Так же, при билде биндится адрес Slunk сервера:
+
+```
+/splunkforwarder/bin/splunk add forward-server <host_or_ip>:9997 -auth 'adminforward:admin4orward' \
+```
+
 
 Название images следует изменить в docker-compose: 
 
@@ -105,6 +117,29 @@ services:
        - /var/run/docker.sock:/var/run/docker.sock:ro
 ```
 
-Входим bash в запущеннй контейнер `docker exec -it <container_id> bash`
+* Скрипты вывода метрик и логов в Splunk: `./u-splunk-forwarder/docker-stats`
+* Передаваемые поля: `./u-splunk-forwarder/docker-stats/props.conf`
+* Время срабатывания скриптов: `/u-splunk-forwarder/init/inputs.conf`
 
-`/splunkforwarder/bin/splunk add forward-server so1:9997`
+Скрипт, выдающий только diff логи:
+
+```
+#!/bin/bash
+DOCKER_BIN=docker
+
+for container_id in $("$DOCKER_BIN" ps -q); do
+    LOGS=$("$DOCKER_BIN" logs "$container_id" 2> /dev/null)
+
+    if [ ! -f "logs.id-$container_id" ]; then
+    touch "logs.id-$container_id"
+    fi
+    
+    if ! diff -q <(echo "$LOGS") "logs.id-$container_id" > /dev/null; then
+        DIFF_LOGS=$(diff -d --changed-group-format='%>' --unchanged-group-format='' "logs.id-$container_id" <(echo "$LOGS") )
+        echo "$LOGS" > "logs.id-$container_id"
+        echo "$DIFF_LOGS"
+    fi
+done
+```
+
+За основу взят: https://github.com/outcoldman/docker-stats-splunk-forwarder/tree/master

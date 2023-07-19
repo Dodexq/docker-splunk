@@ -1,7 +1,6 @@
 FROM centos:7
 ENV SPLUNK_HOME /splunkforwarder
 ENV SPLUNK_ROLE splunk_heavy_forwarder
-ENV SPLUNK_PASSWORD passwd!@#
 ENV SPLUNK_START_ARGS --accept-license
 ENV SPLUNK_INDEXER_HOST so1
 
@@ -16,7 +15,7 @@ RUN wget -O splunkforwarder-7.2.4-8a94541dcfac-Linux-x86_64.tgz 'https://downloa
     && rm -f docker-18.09.3.tgz
 
 COPY [ "inputs.conf", "docker-stats/props.conf", "/splunkforwarder/etc/system/local/" ]
-COPY [ "docker-stats/docker_events.sh", "docker-stats/docker_inspect.sh", "docker-stats/docker_stats.sh", "docker-stats/docker_top.sh", "docker-stats/docker_stats.sh", "/splunkforwarder/bin/scripts/" ]
+COPY [ "docker-stats/docker_events.sh", "docker-stats/docker_inspect.sh", "docker-stats/docker_stats.sh", "docker-stats/docker_top.sh", "docker-stats/docker_logs.sh", "/splunkforwarder/bin/scripts/" ]
 COPY first_start.sh /splunkforwarder/bin/
 
 RUN chmod +x /splunkforwarder/bin/scripts/*.sh \
@@ -25,8 +24,9 @@ RUN chmod +x /splunkforwarder/bin/scripts/*.sh \
     && echo "%sudo ALL=NOPASSWD:ALL" >> /etc/sudoers \
     && chown -R splunk:splunk $SPLUNK_HOME \
     && /splunkforwarder/bin/first_start.sh \
-    && /splunkforwarder/bin/splunk add forward-server ${SPLUNK_INDEXER_HOST}:9997 \
-    && /splunkforwarder/bin/splunk restart
+    && sleep 5 \
+    && /splunkforwarder/bin/splunk add forward-server so1:9997 -auth 'adminforward:admin4orward' \
+    && /splunkforwarder/bin/splunk restart 
 
 COPY [ "init/entrypoint.sh", "init/checkstate.sh", "/sbin/" ]
 
