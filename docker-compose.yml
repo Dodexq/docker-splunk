@@ -1,54 +1,47 @@
-version: "3.6"
+version: '3'
 
 networks:
   splunknet:
-    driver: bridge
-    attachable: true
 
 services:
   uf1:
-    networks:
-      splunknet:
-        aliases:
-          - uf1
-    image: ${UF_IMAGE:-dodex/uforward2:latest}
+    image: dodex/uforward2:latest
     hostname: uf1
     container_name: uf1
+    networks:
+      - splunknet
     environment:
       - SPLUNK_STANDALONE_URL=so1
       - SPLUNK_INDEX=dev
     volumes:
        - /var/lib/docker/containers:/host/containers:ro
        - /var/run/docker.sock:/var/run/docker.sock:ro
-    ports:
-      - 8089
 
   so1:
-    networks:
-      splunknet:
-        aliases:
-          - so1
-    image: ${SPLUNK_IMAGE:-splunk/splunk:latest}
+    image: splunk/splunk
     hostname: so1
     container_name: so1
+    networks:
+      - splunknet
     environment:
       - SPLUNK_START_ARGS= --accept-license
       - SPLUNK_STANDALONE_URL=so1
       - SPLUNK_PASSWORD=admin!@#
+    volumes:
+      - ./so1-var:/opt/splunk/var
+      - ./so1-etc:/opt/splunk/etc
     ports:
       - 8000:8000
       - 8088:8088
       - 8089
       - 9997
 
-  nginx:
+  nginx1:
+    image: nginx
+    hostname: nginx1
+    container_name: nginx1
     networks:
-      splunknet:
-        aliases:
-          - nginx
-    image: ${SPLUNK_IMAGE:-nginx}
-    hostname: nginx
-    container_name: nginx
+      - splunknet
     logging:
         driver: splunk
         options:
@@ -60,3 +53,40 @@ services:
             tag: "{{.Name}}/{{.ID}}"
     ports:
       - 80:80
+
+  
+  nginx2:
+    image: nginx
+    hostname: nginx2
+    container_name: nginx2
+    networks:
+      - splunknet
+    logging:
+        driver: splunk
+        options:
+            splunk-url: http://172.23.0.3:8088
+            splunk-token: 38fd07e4-fe12-4d36-9e15-b0a3df561b1a
+            splunk-index: splunk_index
+            splunk-insecureskipverify: "true"
+            splunk-format: "json"
+            tag: "{{.Name}}/{{.ID}}"
+    ports:
+      - 81:80
+
+  nginx3:
+    image: nginx
+    hostname: nginx3
+    container_name: nginx3
+    networks:
+      - splunknet
+    logging:
+        driver: splunk
+        options:
+            splunk-url: http://172.23.0.3:8088
+            splunk-token: 38fd07e4-fe12-4d36-9e15-b0a3df561b1a
+            splunk-index: splunk_index
+            splunk-insecureskipverify: "true"
+            splunk-format: "json"
+            tag: "{{.Name}}/{{.ID}}"
+    ports:
+      - 81:80
