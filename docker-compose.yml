@@ -5,7 +5,7 @@ networks:
 
 services:
   uf1:
-    image: dodex/uforward2:latest
+    image: dodex/uforward:latest
     hostname: uf1
     container_name: uf1
     networks:

@@ -70,3 +70,41 @@ Token Value следует скопировать, будем использов
 </p>
 
 По тегам можно выбрать контейнер.
+
+## Настройка Splunk сервера + сборка docker image "splunk-forward" с пушем метрик и логов Docker сокета
+
+Запуск сервера Splunk-enterprise `docker-compose up so1 -d`
+
+UI Splunk доступен на порту 8000 `http://localhost:8000`
+
+Login `admin` pass: `admin!@#` - можно изменить env: `- SPLUNK_PASSWORD=admin!@#`
+
+Проверяем, доступен ли 9997 порт `Settings > Forwarding and receiving > Configure receiving > status:Enabled`
+
+<p align="center"> 
+<a href="https://raw.githubusercontent.com/Dodexq/docker-splunk/main/screenshots/4.png" rel="some text"><img src="https://raw.githubusercontent.com/Dodexq/docker-splunk/main/screenshots/4.png" alt="" width="500" /></a>
+</p>
+
+Build images: `cd ./u-splunk-forwarder > docker build --tag="$USER/uforward" .`
+
+Название images следует изменить в docker-compose: 
+
+```
+services:
+  uf1:
+    image: <images>
+    hostname: uf1
+    container_name: uf1
+    networks:
+      - splunknet
+    environment:
+      - SPLUNK_STANDALONE_URL=so1
+      - SPLUNK_INDEX=dev
+    volumes:
+       - /var/lib/docker/containers:/host/containers:ro
+       - /var/run/docker.sock:/var/run/docker.sock:ro
+```
+
+Входим bash в запущеннй контейнер `docker exec -it <container_id> bash`
+
+`/splunkforwarder/bin/splunk add forward-server so1:9997`

@@ -3,6 +3,7 @@ ENV SPLUNK_HOME /splunkforwarder
 ENV SPLUNK_ROLE splunk_heavy_forwarder
 ENV SPLUNK_PASSWORD passwd!@#
 ENV SPLUNK_START_ARGS --accept-license
+ENV SPLUNK_INDEXER_HOST so1
 
 RUN yum install -y epel-release \
     && yum install -y wget expect jq
@@ -24,6 +25,7 @@ RUN chmod +x /splunkforwarder/bin/scripts/*.sh \
     && echo "%sudo ALL=NOPASSWD:ALL" >> /etc/sudoers \
     && chown -R splunk:splunk $SPLUNK_HOME \
     && /splunkforwarder/bin/first_start.sh \
+    && /splunkforwarder/bin/splunk add forward-server ${SPLUNK_INDEXER_HOST}:9997 \
     && /splunkforwarder/bin/splunk restart
 
 COPY [ "init/entrypoint.sh", "init/checkstate.sh", "/sbin/" ]
