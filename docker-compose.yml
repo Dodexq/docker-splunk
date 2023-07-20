@@ -64,7 +64,7 @@ services:
     logging:
         driver: splunk
         options:
-            splunk-url: http://172.23.0.2:8088
+            splunk-url: http://172.23.0.3:8088
             splunk-token: f16ff2ee-0773-43e3-9bbd-21f1bca57110
             splunk-index: splunk_index
             splunk-insecureskipverify: "true"
